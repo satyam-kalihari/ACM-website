@@ -1,13 +1,10 @@
 import mongoose from "mongoose";
+import { MongooseCache } from "@/types";
 
 const uri = process.env.MONGODB_URI!
 
 if (!uri) throw new Error("Please insert your MongoDB URI in the env");
 
-interface MongooseCache {
-    conn: typeof mongoose | null;
-    promise: Promise<typeof mongoose> | null;
-}
 
 
 let cached : MongooseCache = (global as any).mongoose as MongooseCache
@@ -28,8 +25,9 @@ export default async function connectToDB() {
 
     try {
         cached.conn = await cached.promise;
+        console.log("Successfully connected to the database!")
     } catch (err) {
-        console.log(err)
+        throw new Error("Unable to connect to the Database")
     }
 
     return cached.conn
