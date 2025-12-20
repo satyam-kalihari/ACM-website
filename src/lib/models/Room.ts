@@ -1,7 +1,7 @@
-import { iRoom } from "@/types";
+import { IRoom } from "@/types";
 import {Schema, model} from "mongoose";
 
-const RoomSchema : Schema<iRoom> = new Schema(
+const RoomSchema : Schema<IRoom> = new Schema(
     {
         name: {
             type: String,
@@ -28,7 +28,8 @@ const RoomSchema : Schema<iRoom> = new Schema(
             required: true
         },
         rules: {
-            type: [String]
+            type: [String],
+            default: []
         },
         createdBy: {
             type: Schema.Types.ObjectId,
@@ -38,17 +39,25 @@ const RoomSchema : Schema<iRoom> = new Schema(
         createdAt: {
             type: Schema.Types.Date,
             required: true,
-            default: Date.now()
+            default: Date.now
         },
         memberCount: {
             type: Number,
             required: true,
             default: 1
+        },
+        members: {
+            type: [
+                {
+                    type: Schema.Types.ObjectId
+                }
+            ],
+            default: []
         }
 
     }
 )
 
-const Room = model<iRoom>("Room", RoomSchema);
+const Room = model<IRoom>("Room", RoomSchema);
 
 export default Room
