@@ -1,8 +1,8 @@
 import { Types, Document } from "mongoose";
 
 
-export interface iUser extends Document {
-    id: Types.ObjectId;
+export interface IUser extends Document {
+    _id: Types.ObjectId;
     username: string;
     email: string;
     clerkId: string;
@@ -18,8 +18,8 @@ export interface iUser extends Document {
 }
 
 
-export interface iRoom extends Document {
-    id: Types.ObjectId;
+export interface IRoom extends Document {
+    _id: Types.ObjectId;
     name: string;
     description: string;
     slug: string;
@@ -30,4 +30,20 @@ export interface iRoom extends Document {
     createdBy: Types.ObjectId;
     createdAt: Date;
     memberCount: number;
+    members: Types.ObjectId[]
+}
+
+export interface IProject extends Document{
+    _id: Types.ObjectId;
+    title: string;
+    description: string;
+    room: Types.ObjectId;
+    liveUrl: string;
+    repoUrl: string;
+    techStack: string[];
+    images: string[];
+    viewCount: number;
+    createdAt: Date;
+    author: Types.ObjectId;
+    upVotes: [Types.ObjectId];
 }

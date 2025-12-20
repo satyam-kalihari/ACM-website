@@ -1,5 +1,5 @@
-import connectToDB from "@/lib/db/connectToDB";
 import Room from "@/lib/models/Room";
+import connectToDB from "@/lib/db/connectToDB";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -7,12 +7,10 @@ export async function POST(req: Request) {
     let payload;
 
     try {
-        payload = await req.json();
-    } catch (e) {
-        return NextResponse.json({ success: false, msg: "Invalid payload" }, { status: 400 });
+        payload = await req.json()
+    } catch {
+        return NextResponse.json({ success: false, msg: "Invalid Payload" }, { status: 400 })
     }
-
-    // yet to add zod to validate
 
     try {
         await connectToDB();
@@ -21,11 +19,15 @@ export async function POST(req: Request) {
     }
 
     try {
-        const room = await Room.create(payload);
-        return NextResponse.json({ success: true, msg: "Room Created", data: room }, { status: 200 });
+        const room = await Room.findByIdAndUpdate(payload.id, { $set: payload }, { new: true }).lean();
+        console.log(room)
+
+        return NextResponse.json({ success: true, msg: "Succesfully Updated", data: room })
     } catch (e) {
+        // console.log(e)
         console.log((e as Error).message);
         return NextResponse.json({ success: false, msg: "Bad Request" }, { status: 400 })
     }
 
 }
+

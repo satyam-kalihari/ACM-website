@@ -1,7 +1,7 @@
-import { iUser } from '@/types'
+import { IUser } from '@/types'
 import { Schema, model } from 'mongoose'
 
-const UserSchema : Schema<iUser> = new Schema(
+const UserSchema: Schema<IUser> = new Schema(
     {
         username: {
             type: String,
@@ -30,6 +30,7 @@ const UserSchema : Schema<iUser> = new Schema(
         },
         techStack: {
             type: [String],
+            default: []
         },
         leetcodeUsername: {
             type: String,
@@ -41,16 +42,19 @@ const UserSchema : Schema<iUser> = new Schema(
             unique: true
         },
         joinedRooms: {
-            type: [Schema.Types.ObjectId],
+            type: [{
+                type: Schema.Types.ObjectId,
+                ref: "Room"
+            }],
             default: []
         },
         createdAt: {
             type: Schema.Types.Date,
-            default: Date.now()
+            default: Date.now
         }
     }
 )
 
-const User = model<iUser>("User", UserSchema);
+const User = model<IUser>("User", UserSchema);
 
 export default User
