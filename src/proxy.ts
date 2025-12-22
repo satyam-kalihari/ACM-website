@@ -14,7 +14,7 @@ export default clerkMiddleware(async (auth, req) => {
   const { isAuthenticated, redirectToSignIn, sessionClaims } = await auth();
 
   if (!isAuthenticated && !isPublicRoute(req)) {
-    return redirectToSignIn();
+    return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 
   if (isAuthenticated) {
@@ -23,26 +23,29 @@ export default clerkMiddleware(async (auth, req) => {
       if (userId) {
         const user = await clerkClient.users.getUser(userId);
         const role = user.publicMetadata.role as string | undefined;
-  
+
         //admin role redirection
         if (role === "admin" && req.nextUrl.pathname == "/dashboard") {
           return NextResponse.redirect(new URL("/admin/dashboard", req.url));
         }
-  
+
         if (role !== "admin" && req.nextUrl.pathname.startsWith("/admin")) {
           return NextResponse.redirect(new URL("/dashboard"));
         }
-  
+
         // redirect auth user trying to access public routes
         if (isPublicRoute(req)) {
           return NextResponse.redirect(
-            new URL(role === "admin" ? "/admin/dashboard" : "/dashboard", req.url)
+            new URL(
+              role === "admin" ? "/admin/dashboard" : "/dashboard",
+              req.url
+            )
           );
         }
       }
     } catch (error) {
-      console.error(error)
-      return NextResponse.redirect(new URL("/", req.url))
+      console.error(error);
+      return NextResponse.redirect(new URL("/", req.url));
     }
   }
 });
