@@ -91,7 +91,14 @@ const SignUp = () => {
           <CardTitle>Sign-up for your account</CardTitle>
           <CardDescription>Enter your email below to sign-up</CardDescription>
           <CardAction>
-            <Button variant="link">Sign In</Button>
+            <Button
+              variant="link"
+              onClick={() => {
+                router.push("/sign-in");
+              }}
+            >
+              Sign In
+            </Button>
           </CardAction>
         </CardHeader>
         <CardContent>

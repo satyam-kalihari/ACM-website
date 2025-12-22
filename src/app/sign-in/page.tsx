@@ -108,7 +108,13 @@ const SignIn = () => {
         </form>
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button variant="outline" className="w-full">
+        <Button
+          onClick={() => {
+            router.push("/sign-up");
+          }}
+          variant="outline"
+          className="w-full"
+        >
           Sign Up
         </Button>
       </CardFooter>
