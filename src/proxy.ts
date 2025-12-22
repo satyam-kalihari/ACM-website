@@ -11,7 +11,7 @@ const clerkClient = createClerkClient({
   secretKey: process.env.CLERK_SECRET_KEY,
 });
 export default clerkMiddleware(async (auth, req) => {
-  const { isAuthenticated, redirectToSignIn, sessionClaims } = await auth();
+  const { isAuthenticated, sessionClaims } = await auth();
 
   if (!isAuthenticated && !isPublicRoute(req)) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
