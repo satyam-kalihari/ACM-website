@@ -27,7 +27,7 @@ const Leetcode = (leetCodeUsername: string) => {
   const fetchLeetCodeData = async () => {
     try {
       const response: AxiosResponse<leetCodeData> = await axios.get(
-        `https://leetcode-stats-api.herokuapp.com/satyam_kalihari`
+        `https://leetcode-stats-api.herokuapp.com/${leetCodeUsername}`
       );
       console.log(response.data);
       if (response) {
