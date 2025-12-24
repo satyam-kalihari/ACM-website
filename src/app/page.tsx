@@ -1,7 +1,5 @@
-
 import { auth, clerkClient } from '@clerk/nextjs/server'
 import React from 'react'
-
 
 const page = async() => {
   const { sessionClaims } = await auth();
