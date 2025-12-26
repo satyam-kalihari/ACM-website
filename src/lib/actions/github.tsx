@@ -1,8 +1,8 @@
 "use client";
-import React, { useState } from "react";
+// import React, { useState } from "react";
 import axios from "axios";
 import type { AxiosResponse } from "axios";
-import Image from "next/image";
+// import Image from "next/image";
 
 interface githubUserData {
   login: string;
@@ -23,7 +23,7 @@ interface githubUserData {
   received_events_url: string;
   type: string;
   user_view_type: string;
-  site_admin: false;
+  site_admin: boolean;
   name: string;
   company: string;
   blog: string;
@@ -40,32 +40,43 @@ interface githubUserData {
   updated_at: string;
 }
 
-const Github = (username: string) => {
-  const [githubData, setGithubData] = useState<githubUserData>();
+export async function getGithubData(username: string) {
+  // const [githubData, setGithubData] = useState<githubUserData>();
 
-  async function getGithubData() {
+  try {
     const response: AxiosResponse<githubUserData> = await axios.get(
       `https://api.github.com/users/${username}`
     );
-    if (response) {
-      setGithubData(response.data);
+    console.log(response.data);
+
+    //USE RESPONSE.DATA FOR UPDATING THE BACKEND
+
+    // if (response) {
+    //   setGithubData(response.data);
+    // }
+
+    //FOR TOTAL STARS ON A GITHUB PROFILE (FOR CALCULATING LEADERBOARD SCORE)
+    let repos = [];
+    const repoResponce = await axios.get(
+      "https://api.github.com/users/${username}/repos?per_page=100"
+    );
+    if (repoResponce.data) {
+      repos = repoResponce.data;
+      const totalStars = repos.reduce(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (sum: number, repo: any) => sum + (repo.stargazers_count || 0),
+        0
+      );
+      console.log("Total stars", totalStars);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.log("Axios Error", error.message);
+      if (error.response) {
+        console.log(error.response.status);
+      }
     }
   }
-
-  return (
-    <div>
-      <button onClick={getGithubData}>press fot github data</button>
-      {JSON.stringify(githubData)}
-      {githubData?.avatar_url && (
-        <Image
-          src={githubData?.avatar_url}
-          alt="avater"
-          width={100}
-          height={100}
-        />
-      )}
-    </div>
-  );
-};
-
-export default Github;
+}
