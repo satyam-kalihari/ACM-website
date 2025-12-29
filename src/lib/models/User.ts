@@ -1,5 +1,5 @@
 import { IUser } from '@/types'
-import { Schema, model } from 'mongoose'
+import mongoose, { Schema, model } from 'mongoose'
 
 const UserSchema: Schema<IUser> = new Schema(
     {
@@ -34,12 +34,14 @@ const UserSchema: Schema<IUser> = new Schema(
         },
         leetcodeUsername: {
             type: String,
-            unique: true
+            unique: true,
+            sparse: true
         },
         githubUrl: {
             type: String,
             required: true,
-            unique: true
+            unique: true,
+            sparse: true
         },
         joinedRooms: {
             type: [{
@@ -55,6 +57,6 @@ const UserSchema: Schema<IUser> = new Schema(
     }
 )
 
-const User = model<IUser>("User", UserSchema);
+const User: mongoose.Model<IUser> = mongoose.models.User as mongoose.Model<IUser> || model<IUser>("User", UserSchema);
 
 export default User

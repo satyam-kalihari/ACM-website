@@ -1,5 +1,6 @@
 import connectToDB from "@/lib/db/connectToDB";
 import Room from "@/lib/models/Room";
+import User from "@/lib/models/User";
 import { NextResponse } from "next/server";
 
 
@@ -22,7 +23,13 @@ export async function POST(req: Request) {
     }
 
     try {
-        const room = await Room.findByIdAndUpdate(payload.id, { members: {} }).lean();
+        const user = await User.findByIdAndUpdate(payload.userId, { $push: { joinedRooms: payload.id } }, { new: true }).lean();
+
+        if (!user) {
+            return NextResponse.json({ success: false, msg: "User Not Found" }, { status: 404 })
+        }
+
+        const room = await Room.findByIdAndUpdate(payload.id, { $push: { members: payload.userId } }, { new: true }).lean();
         return NextResponse.json({ success: true, msg: "Succesfully Joined", data: room })
     } catch (e) {
         console.log((e as Error).message);

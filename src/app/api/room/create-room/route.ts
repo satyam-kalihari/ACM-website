@@ -1,6 +1,9 @@
 import connectToDB from "@/lib/db/connectToDB";
 import Room from "@/lib/models/Room";
 import { NextResponse } from "next/server";
+import { RoomSchema } from "@/lib/validators/RoomSchema";
+import { z } from "zod";
+import User from "@/lib/models/User";
 
 export async function POST(req: Request) {
 
@@ -12,7 +15,25 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: false, msg: "Invalid payload" }, { status: 400 });
     }
 
-    // yet to add zod to validate
+    const data = {
+        name: payload?.name,
+        description: payload?.description,
+        slug: payload?.slug,
+        category: payload?.category,
+        icon: payload?.icon,
+        isActive: payload?.isActive,
+        rules: payload?.rules,
+        createdBy: payload?.createdBy,
+        memberCount: payload?.members?.length,
+        members: [...payload?.members, payload?.createdBy]
+    }
+
+    const createRoomSchema = RoomSchema.safeParse(data);
+
+
+    if (!createRoomSchema.success) {
+        return NextResponse.json({ success: false, msg: z.treeifyError(createRoomSchema.error) }, { status: 400 });
+    }
 
     try {
         await connectToDB();
@@ -21,7 +42,8 @@ export async function POST(req: Request) {
     }
 
     try {
-        const room = await Room.create(payload);
+        const room = await Room.create(data);
+        const updateUser = await User.findByIdAndUpdate(payload?.createdBy, {$push: {joinedRooms: room._id}}, {new: true}).lean()
         return NextResponse.json({ success: true, msg: "Room Created", data: room }, { status: 200 });
     } catch (e) {
         console.log((e as Error).message);

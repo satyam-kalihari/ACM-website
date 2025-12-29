@@ -19,12 +19,20 @@ export async function POST(req: Request) {
     }
 
     try {
-        const room = await Room.findByIdAndUpdate(payload.id, { $set: payload }, { new: true }).lean();
+        const room = await Room.findByIdAndUpdate(payload.id, {
+            $set: {
+                name: payload.name,
+                slug: payload.slug,
+                category: payload.category,
+                icon: payload.icon,
+                isActive: payload.isActive,
+                createdBy: payload.createdBy
+            }
+        }, { new: true }).lean();
         console.log(room)
 
         return NextResponse.json({ success: true, msg: "Succesfully Updated", data: room })
     } catch (e) {
-        // console.log(e)
         console.log((e as Error).message);
         return NextResponse.json({ success: false, msg: "Bad Request" }, { status: 400 })
     }

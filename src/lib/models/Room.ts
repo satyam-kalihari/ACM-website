@@ -1,7 +1,7 @@
 import { IRoom } from "@/types";
-import {Schema, model} from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 
-const RoomSchema : Schema<IRoom> = new Schema(
+const RoomSchema: Schema<IRoom> = new Schema(
     {
         name: {
             type: String,
@@ -49,7 +49,8 @@ const RoomSchema : Schema<IRoom> = new Schema(
         members: {
             type: [
                 {
-                    type: Schema.Types.ObjectId
+                    type: Schema.Types.ObjectId,
+                    ref: "User"
                 }
             ],
             default: []
@@ -58,6 +59,6 @@ const RoomSchema : Schema<IRoom> = new Schema(
     }
 )
 
-const Room = model<IRoom>("Room", RoomSchema);
+const Room: mongoose.Model<IRoom> = (mongoose.models.Room as mongoose.Model<IRoom>) || model<IRoom>("Room", RoomSchema);
 
 export default Room

@@ -6,12 +6,18 @@ import {
 import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher(["/sign-up(.*)", "/sign-in(.*)"]);
-const isProtectedRoute = createRouteMatcher(["/admin/dashboard(.*)"]);
+const isAdminProtectedRoute = createRouteMatcher(["/admin/dashboard(.*)", "/api/room(.*)"]);
 const clerkClient = createClerkClient({
   secretKey: process.env.CLERK_SECRET_KEY,
 });
+
+
 export default clerkMiddleware(async (auth, req) => {
   const { isAuthenticated, sessionClaims } = await auth();
+
+  
+
+  return NextResponse.next();
 
   if (!isAuthenticated && !isPublicRoute(req)) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
@@ -48,6 +54,7 @@ export default clerkMiddleware(async (auth, req) => {
       return NextResponse.redirect(new URL("/", req.url));
     }
   }
+  // return NextResponse.next();
 });
 
 export const config = {
