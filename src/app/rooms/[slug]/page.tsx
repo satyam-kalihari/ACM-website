@@ -3,7 +3,6 @@
 import ChatComponent from '@/components/ChatComponent'
 import React, {useEffect} from 'react'
 import { useCurrentRoom } from '@/context/CurrentRoomContext'
-import { IRoom } from '@/types'
 import { useParams, useRouter } from 'next/navigation'
 
 const page = () => {
