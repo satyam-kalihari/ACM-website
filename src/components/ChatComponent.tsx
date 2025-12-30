@@ -5,10 +5,11 @@ import { Button } from './ui/button';
 import { useCurrentRoom } from '@/context/CurrentRoomContext';
 import { useSocket } from '@/context/SocketContext';
 import { useUser } from '@clerk/nextjs';
+import { SidebarTrigger } from './ui/sidebar';
 
 const ChatComponent = () => {
 
-  const { isLoaded, user} = useUser()
+  const { isLoaded, user } = useUser()
   const [dbUser, setDbUser] = useState<any>()
   const [message, setMessage] = useState<String>("");
   const [messages, setMessages] = useState<{ author?: String, message?: String }[]>([]);
@@ -19,43 +20,48 @@ const ChatComponent = () => {
     if (!isLoaded || !user) return;
 
     fetch("/api/user/get-user")
-    .then(res => res.json())
-    .then(res => {setDbUser(res)})
-    
-  },[isLoaded, user])
-  
+      .then(res => res.json())
+      .then(res => { setDbUser(res) })
+
+  }, [isLoaded, user])
+
   useEffect(() => {
-    
+
     socket.on("room-message", handleRoomMessageListener)
 
     return () => {
       socket.off("room-message", handleRoomMessageListener)
     }
   }, [socket])
-  
-  const handleSend = () => {
-    
-    if (message.trim() !== "") {
-        socket.emit("send-message", {roomId: currentRoom?._id, author: dbUser?.user?._id, msg: message})
-      }
-      setMessage("");
-    }
 
-    const handleRoomMessageListener = (data: any) => {
-      setMessages((prev) => [...prev, data])
+  const handleSend = () => {
+
+    if (message.trim() !== "") {
+      socket.emit("send-message", { roomId: currentRoom?._id, author: dbUser?.user?._id, msg: message })
     }
+    setMessage("");
+  }
+
+  const handleRoomMessageListener = (data: any) => {
+    setMessages((prev) => [...prev, data])
+  }
 
 
 
   return (
     <div className='chat-container flex flex-col h-full w-full'>
-      <header>
-
+      <div className='flex min-w-full'>
+        <SidebarTrigger className='h-full w-14 border-b rounded-none' />
+      <header className='py-5 flex px-3 border border-b w-full'>
+        <h1 className='text-2xl'>
+          {currentRoom?.name}
+        </h1>
       </header>
-      <div className='chat-box flex h-full w-full flex-col p-4 gap-2'>
+      </div>
+      <div className='chat-box flex h-full w-full flex-col p-4 gap-2 overflow-y-auto'>
         {messages.map((msg, index) => {
-          return(
-            <div key={index} className={`flex rounded p-2 ${dbUser?.user?._id === msg?.author ? 'self-end bg-black text-white':'self-start'}`}>{msg.message}</div>
+          return (
+            <div key={index} className={`flex rounded p-2 ${dbUser?.user?._id === msg?.author ? 'self-end bg-black text-white' : 'self-start'}`}>{msg.message}</div>
 
           )
         })}

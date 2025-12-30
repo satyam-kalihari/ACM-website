@@ -4,6 +4,7 @@ import {
   createClerkClient,
 } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { createUser } from "./lib/db/createUser";
 
 const isPublicRoute = createRouteMatcher(["/sign-up(.*)", "/sign-in(.*)"]);
 const isAdminProtectedRoute = createRouteMatcher(["/admin/dashboard(.*)", "/api/room(.*)"]);
@@ -12,10 +13,11 @@ const clerkClient = createClerkClient({
 });
 
 
+
 export default clerkMiddleware(async (auth, req) => {
   const { isAuthenticated, sessionClaims } = await auth();
 
-  
+
 
   // return NextResponse.next();
 
@@ -27,9 +29,37 @@ export default clerkMiddleware(async (auth, req) => {
     try {
       const userId = sessionClaims?.sub;
       if (userId) {
-        const user = await clerkClient.users.getUser(userId);
-        const role = user.publicMetadata.role as string | undefined;
 
+
+        const user = await clerkClient.users.getUser(userId);
+        const role = user.publicMetadata.role as "admin" | "user" | "member" | undefined;
+
+        console.log(req.nextUrl.pathname);
+
+        if (req.nextUrl.pathname === "/api/user/create-user" && req.method === "GET") {
+
+          try{
+            const dbUser = await createUser({
+              fullname: user.firstName + " " + user.lastName,
+              email: user.emailAddresses[0].emailAddress,
+              clerkId: user.id,
+              avatar: user.imageUrl,
+              role: role ? role : "user",
+              techStack: []
+            });
+
+            if (dbUser) {
+              return NextResponse.redirect(new URL("/dashboard", req.url));
+            }
+          } catch(e){
+            
+            console.log("DB fetch error:", (e as Error).message);
+            return NextResponse.redirect(new URL("/", req.url));
+          }
+
+        }
+
+        console.log("User ID:", user);
         //admin role redirection
         if (role === "admin" && req.nextUrl.pathname == "/dashboard") {
           return NextResponse.redirect(new URL("/admin/dashboard", req.url));

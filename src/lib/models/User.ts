@@ -3,10 +3,9 @@ import mongoose, { Schema, model } from 'mongoose'
 
 const UserSchema: Schema<IUser> = new Schema(
     {
-        username: {
+        fullname: {
             type: String,
-            required: true,
-            unique: true
+            required: true
         },
         email: {
             type: String,
@@ -39,7 +38,6 @@ const UserSchema: Schema<IUser> = new Schema(
         },
         githubUrl: {
             type: String,
-            required: true,
             unique: true,
             sparse: true
         },

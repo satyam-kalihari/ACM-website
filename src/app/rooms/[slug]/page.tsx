@@ -5,6 +5,7 @@ import React, {useEffect} from 'react'
 import { useCurrentRoom } from '@/context/CurrentRoomContext'
 import { useParams, useRouter } from 'next/navigation'
 
+
 const page = () => {
   const {currentRoom, setCurrentRoom} = useCurrentRoom();
   const { slug } = useParams()
@@ -14,8 +15,7 @@ const page = () => {
     if(currentRoom?.slug !== slug) {
       router.push("/rooms")
     }
-  })
-
+  },[])
 
   return (
     <div className='chat-room w-full h-full'>
