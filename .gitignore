@@ -43,5 +43,5 @@ next-env.d.ts
 # clerk configuration (can include secrets)
 /.clerk/
 
-/websockets/node_modules
-/websockets/.env
+/websocket/node_modules
+/websocket/.env
