@@ -69,6 +69,8 @@ const SignUp = () => {
         code,
       });
 
+      console.log(completeSignUp)
+
       if (completeSignUp.status !== "complete") {
         console.log(JSON.stringify(completeSignUp, null, 2));
       }

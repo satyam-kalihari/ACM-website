@@ -34,8 +34,6 @@ export default clerkMiddleware(async (auth, req) => {
         const user = await clerkClient.users.getUser(userId);
         const role = user.publicMetadata.role as "admin" | "user" | "member" | undefined;
 
-        console.log(req.nextUrl.pathname);
-
         if (req.nextUrl.pathname === "/api/user/create-user" && req.method === "GET") {
 
           try{
@@ -59,7 +57,6 @@ export default clerkMiddleware(async (auth, req) => {
 
         }
 
-        console.log("User ID:", user);
         //admin role redirection
         if (role === "admin" && req.nextUrl.pathname == "/dashboard") {
           return NextResponse.redirect(new URL("/admin/dashboard", req.url));
