@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+// import React, { useState } from "react";
 import axios from "axios";
 import type { AxiosResponse } from "axios";
 
@@ -21,39 +21,21 @@ interface leetCodeData {
   submissionCalendar: { string: number };
 }
 
-const Leetcode = (leetCodeUsername: string) => {
-  const [leetCodeData, setLeetCodedata] = useState<leetCodeData>();
+export default async function fetchLeetCodeData(leetCodeUsername: string) {
+  // const [leetCodeData, setLeetCodedata] = useState<leetCodeData>();
 
-  const fetchLeetCodeData = async () => {
-    try {
-      const response: AxiosResponse<leetCodeData> = await axios.get(
-        `https://leetcode-stats-api.herokuapp.com/${leetCodeUsername}`
-      );
-      console.log(response.data);
-      if (response) {
-        setLeetCodedata(response.data);
-        // console.log("data: ", leetCodeData);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log(error.message);
-      }
-      console.log("Error", error);
+  try {
+    const response: AxiosResponse<leetCodeData> = await axios.get(
+      `https://leetcode-stats-api.herokuapp.com/${leetCodeUsername}`
+    );
+    console.log(response.data);
+    // if (response) {
+    //   setLeetCodedata(response.data);
+    // }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
     }
-  };
-
-  return (
-    <>
-      {" "}
-      <div onClick={fetchLeetCodeData} className="text-black">
-        page
-      </div>
-      <div>{leetCodeData?.ranking}</div>
-      <div>{leetCodeData?.message}</div>
-      <div>{leetCodeData?.status}</div>
-      <div>{JSON.stringify(leetCodeData?.submissionCalendar)}</div>
-    </>
-  );
-};
-
-export default Leetcode;
+    console.log("Error", error);
+  }
+}

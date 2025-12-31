@@ -52,7 +52,7 @@ const SignIn = () => {
       });
       setIsVarificationPending(true);
 
-      console.log(response.status);
+      // console.log(response.status);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
