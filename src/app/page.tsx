@@ -31,10 +31,10 @@ const page = async () => {
           <p> our LeetCode leaderboard. Your developer community awaits.</p>
         </section>
         <section id="CTA" className=" mt-8 grid grid-cols-2 gap-4">
-          <Button className="bg-[#00BCA2] text-black text-[12px] md:text-[16px] hover:text-white">
+          <Button className="bg-[#00BCA2] text-black text-[12px] md:text-[16px] h-12 hover:text-white">
             Explore Rooms
           </Button>
-          <Button className=" text-[12px] md:text-[16px]">
+          <Button className=" text-[12px] md:text-[16px] h-12">
             View Leaderboard
           </Button>
         </section>
