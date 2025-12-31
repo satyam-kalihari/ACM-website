@@ -19,7 +19,6 @@ export default clerkMiddleware(async (auth, req) => {
 
 
 
-  // return NextResponse.next();
 
   if (!isAuthenticated && !isPublicRoute(req)) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
@@ -36,7 +35,7 @@ export default clerkMiddleware(async (auth, req) => {
 
         if (req.nextUrl.pathname === "/api/user/create-user" && req.method === "GET") {
 
-          try{
+          try {
             const dbUser = await createUser({
               fullname: user.firstName + " " + user.lastName,
               email: user.emailAddresses[0].emailAddress,
@@ -49,8 +48,14 @@ export default clerkMiddleware(async (auth, req) => {
             if (dbUser) {
               return NextResponse.redirect(new URL("/dashboard", req.url));
             }
-          } catch(e){
-            
+          } catch (e) {
+
+            await fetch('https://api.clerk.com/v1/users/{user_id}', {
+              method: 'DELETE',
+              headers: {
+                Authorization: req.headers.get('Authorization') || ''
+              }
+            })
             console.log("DB fetch error:", (e as Error).message);
             return NextResponse.redirect(new URL("/", req.url));
           }

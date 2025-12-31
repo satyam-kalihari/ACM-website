@@ -1,3 +1,4 @@
+import Room from "../models/Room";
 import User from "../models/User";
 import connectToDB from "./connectToDB";
 import {Types} from "mongoose";
@@ -12,6 +13,10 @@ interface CreateUserParams {
     leetcodeUsername?: string;
     githubUrl?: string;
 }
+
+// const defaultRoomss = await Room.find({ slug: {
+//     $in: ["acm-chat-room", "projects", "internships", "hackathons", "code-lang"]
+// }})
 
 const defaultRoomsIds = [
     "6951ae33c7e13cb104e1c936",
