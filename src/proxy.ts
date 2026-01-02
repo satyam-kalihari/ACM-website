@@ -49,13 +49,18 @@ export default clerkMiddleware(async (auth, req) => {
               return NextResponse.redirect(new URL("/dashboard", req.url));
             }
           } catch (e) {
+            try {
+              const res: any = await fetch('https://api.clerk.com/v1/users/{user_id}', {
+                method: 'DELETE',
+                headers: {
+                  Authorization: req.headers.get('Authorization') || ''
+                }
+              })
 
-            await fetch('https://api.clerk.com/v1/users/{user_id}', {
-              method: 'DELETE',
-              headers: {
-                Authorization: req.headers.get('Authorization') || ''
-              }
-            })
+              console.log("Failed to create DB user, deleted Clerk user. Clerk response:", res);
+            } catch (err) {
+              console.log("Failed to delete Clerk user after DB user creation failure:", (err as Error).message);
+            }
             console.log("DB fetch error:", (e as Error).message);
             return NextResponse.redirect(new URL("/", req.url));
           }

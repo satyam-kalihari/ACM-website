@@ -160,6 +160,11 @@ const SignUp = () => {
               <Input
                 type="text"
                 value={code}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter"){
+                    onVerify(e);
+                  }
+                }}
                 onChange={(e) => {
                   setCode(e.target.value);
                 }}

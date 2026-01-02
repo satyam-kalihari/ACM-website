@@ -1,6 +1,7 @@
 // import { auth } from "@clerk/nextjs/server";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import React from "react";
 
 const page = async () => {
@@ -31,9 +32,11 @@ const page = async () => {
           <p> our LeetCode leaderboard. Your developer community awaits.</p>
         </section>
         <section id="CTA" className=" mt-8 grid grid-cols-2 gap-4">
-          <Button className="bg-[#00BCA2] text-black text-[12px] md:text-[16px] h-12 hover:text-white">
-            Explore Rooms
-          </Button>
+          <Link href={"/rooms"}>
+            <Button className="bg-[#00BCA2] text-black text-[12px] md:text-[16px] h-12 hover:text-white cursor-pointer">
+              Explore Rooms
+            </Button>
+          </Link>
           <Button className=" text-[12px] md:text-[16px] h-12">
             View Leaderboard
           </Button>
