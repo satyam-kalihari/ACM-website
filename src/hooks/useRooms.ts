@@ -1,38 +1,55 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import { IRoom } from '@/types'
+import { IRoom } from "@/types";
 
 export const useRooms = () => {
+  const [isLoading, setLoading] = useState<boolean>(true);
+  const { isSignedIn, isLoaded, user } = useUser();
+  const [rooms, setRooms] = useState<IRoom[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [error, setError] = useState<any>(null);
 
-    const [isLoading, setLoading] = useState<boolean>(true);
-    const { isSignedIn, isLoaded, user } = useUser();
-    const [rooms, setRooms] = useState<IRoom[]>([]);
-    const [error, setError] = useState();
-    
+  useEffect(() => {
+    if (!isLoaded) return;
 
-    
-    useEffect(() => {
-        if (!user?.id && !isLoaded) return 
+    if (!isSignedIn || !user?.id) {
+      setLoading(false);
+      setRooms([]);
+      return;
+    }
 
+    let isMounted = true;
 
-        if( user?.id && isLoaded){
+    const fetchRooms = async () => {
+      try {
+        setLoading((prev) => (!prev ? true : prev));
 
-            setLoading(true)
+        const res = await fetch("/api/user/get-rooms");
+        const data = await res.json();
 
-            fetch("/api/user/get-rooms", )
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    setRooms(data.rooms);
-                    setLoading(false)
-                } else {
-                    setRooms([])
-                    setLoading(false)
-                }
-            })
+        if (isMounted) {
+          if (data.success) {
+            setRooms(data.rooms);
+          } else {
+            setRooms([]);
+          }
         }
-    }, [user?.id, isLoaded, isSignedIn]);
+      } catch (err) {
+        if (isMounted) {
+          console.error("Error fetching rooms:", err);
+          setError(err);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
 
-    return {rooms, isLoading, error };
+    fetchRooms();
 
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id, isLoaded, isSignedIn]);
+
+  return { rooms, isLoading, error };
 };

@@ -70,6 +70,7 @@ const SidebarContainer = () => {
                             </SidebarMenu>) :
                                 rooms?.map((room) => {
 
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     const handleClick = (event: any) => {
                                         socket.emit("join-room", room);
                                         socket.on("joined-successfully", (sRoom) => {
