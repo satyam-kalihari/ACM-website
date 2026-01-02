@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useCurrentRoom } from '@/context/CurrentRoomContext'
 import { useRouter } from 'next/navigation'
 import { useSocket } from '@/context/SocketContext'
@@ -62,8 +62,7 @@ const SidebarContainer = () => {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {isLoading ? (<SidebarMenu>
-                                {/* length hardcoded hai */}
-                                {rooms?.map((_, index) => (
+                                {Array.from({ length: 5 }).map((_, index) => (
                                     <SidebarMenuItem key={index}>
                                         <SidebarMenuSkeleton showIcon />
                                     </SidebarMenuItem>
