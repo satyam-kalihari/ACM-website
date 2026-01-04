@@ -69,7 +69,7 @@ const SignUp = () => {
         code,
       });
 
-      console.log(completeSignUp)
+      console.log(completeSignUp);
 
       if (completeSignUp.status !== "complete") {
         console.log(JSON.stringify(completeSignUp, null, 2));
@@ -78,7 +78,7 @@ const SignUp = () => {
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
 
-        router.push("/api/user/create-user");
+        router.push("/dashboard");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
