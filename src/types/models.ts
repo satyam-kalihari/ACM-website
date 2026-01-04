@@ -47,3 +47,13 @@ export interface IProject extends Document{
     author: Types.ObjectId;
     upVotes: [Types.ObjectId];
 }
+
+export interface IMessage extends Document{
+    _id: Types.ObjectId;
+    content: string;
+    attachments: string[];
+    createdAt: Date;
+    room: Types.ObjectId;
+    sender: Types.ObjectId;
+    readBy: Types.ObjectId[];
+}

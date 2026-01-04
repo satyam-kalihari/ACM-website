@@ -1,5 +1,5 @@
 import { IProject } from "@/types";
-import { model, Schema } from "mongoose";
+import { model, models, Schema } from "mongoose";
 
 const ProjectSchema: Schema<IProject> = new Schema(
     {
@@ -56,6 +56,6 @@ const ProjectSchema: Schema<IProject> = new Schema(
     }
 )
 
-const Project = model<IProject>("Project", ProjectSchema);
+const Project = models.Project ||model<IProject>("Project", ProjectSchema);
 
 export default Project;
