@@ -1,8 +1,40 @@
 import mongoose from "mongoose";
 import Message from "@/lib/models/Message";
 import { NextResponse } from "next/server";
+import connectToDB from "@/lib/db/connectToDB";
 
 export default async function POST(req: Request) {
+
+    try {
+        await connectToDB();
+    } catch (error) {
+        return NextResponse.json({ error: "Failed to connect to database" }, { status: 500 });
+    }
+
+    if (!req.body) {
+        return NextResponse.json({ error: "No data provided" }, { status: 400 });
+    }
+
+    const { content, attachments, roomId, senderId } = await req.json();
+
+    if (!content || !roomId || !senderId) {
+        return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const newMessage = new Message({
+        content,
+        attachments: attachments || [],
+        room: new mongoose.Types.ObjectId(roomId),
+        sender: new mongoose.Types.ObjectId(senderId),
+    });
+
+    try {
+        await newMessage.save();
+    } catch (error) {
+        return NextResponse.json({ error: "Failed to send message" }, { status: 500 });
+    }
+
+    
 
     return NextResponse.json({ message: "Message sent successfully" });
 }
