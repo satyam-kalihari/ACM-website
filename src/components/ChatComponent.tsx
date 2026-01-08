@@ -11,8 +11,8 @@ const ChatComponent = () => {
 
   const { isLoaded, user } = useUser()
   const [dbUser, setDbUser] = useState<any>()
-  const [message, setMessage] = useState<String>("");
-  const [messages, setMessages] = useState<{ author?: String, message?: String }[]>([]);
+  const [message, setMessage] = useState<string>("");
+  const [messages, setMessages] = useState<{ author?: string, message?: string }[]>([]);
   const { currentRoom, setCurrentRoom } = useCurrentRoom();
   const socket = useSocket()
 
@@ -25,7 +25,48 @@ const ChatComponent = () => {
 
   }, [isLoaded, user])
 
+  const fetchMessages = async (body: any) => {
+
+    const response = await fetch("/api/message/get-content", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    })
+
+    const data = await response.json();
+
+    if (data.success) {
+
+      const cont = data.content
+        .slice()
+        .reverse()
+        .map((m: any) => ({
+          author: m.sender,
+          message: m.content
+        }));
+
+      setMessages(cont);
+
+    }
+    console.log(data)
+  }
+
   useEffect(() => {
+    fetchMessages({
+      userId: dbUser?.user?._id,
+      roomId: currentRoom?._id
+    })
+  }, [dbUser?.user])
+
+  const handleRoomMessageListener = (data: any) => {
+    setMessages((prev) => [...prev, data])
+  }
+
+  useEffect(() => {
+
+    if (!socket) return;
 
     socket.on("room-message", handleRoomMessageListener)
 
@@ -34,34 +75,58 @@ const ChatComponent = () => {
     }
   }, [socket])
 
-  const handleSend = () => {
-
+  const handleSend = async () => {
+    
     if (message.trim() !== "") {
-      socket.emit("send-message", { roomId: currentRoom?._id, author: dbUser?.user?._id, msg: message })
+      
+      const res = await fetch("/api/message/send-message",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            roomId: currentRoom?._id,
+            senderId: dbUser?.user?._id,
+            content: message,
+            
+          })
+        }
+      )
+      setMessage("");
+
+      const data = await res.json();
+      if (data.success) {
+        socket.emit("send-message", { roomId: currentRoom?._id, author: dbUser?.user?._id, msg: message })
+
+      } else {
+        console.log(data)
+      }
     }
-    setMessage("");
   }
 
-  const handleRoomMessageListener = (data: any) => {
-    setMessages((prev) => [...prev, data])
-  }
+  useEffect(() => {
+  const chatBox = document.querySelector('.chat-box');
+  chatBox?.scrollTo({ top: chatBox.scrollHeight });
+}, [messages]);
+
 
 
 
   return (
-    <div className='chat-container flex flex-col h-full w-full'>
+    <div className='chat-container flex flex-col h-full'>
       <div className='flex min-w-full'>
         <SidebarTrigger className='h-full w-14 border-b rounded-none' />
-      <header className='py-5 flex px-3 border border-b w-full'>
-        <h1 className='text-2xl'>
-          {currentRoom?.name}
-        </h1>
-      </header>
+        <header className='py-5 flex px-3 border border-b w-full'>
+          <h1 className='text-2xl'>
+            {currentRoom?.name}
+          </h1>
+        </header>
       </div>
-      <div className='chat-box flex h-full w-full flex-col p-4 gap-2 overflow-y-auto'>
+      <div className='chat-box flex h-full w-full flex-col p-4 gap-2 min-w-0 overflow-y-auto'>
         {messages.map((msg, index) => {
           return (
-            <div key={index} className={`flex rounded p-2 ${dbUser?.user?._id === msg?.author ? 'self-end bg-black text-white' : 'self-start'}`}>{msg.message}</div>
+            <div key={index} className={`flex rounded wrap-break-word p-2 ${dbUser?.user?._id === msg?.author ? 'self-end bg-black text-white' : 'self-start'}`}>{msg.message}</div>
 
           )
         })}
