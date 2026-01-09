@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useSignIn } from "@clerk/nextjs";
+import React, { useState, useEffect } from "react";
+import { useSignIn, useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
 import { Spinner } from "@/components/ui/spinner";
@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 
 const SignIn = () => {
   const { isLoaded, signIn, setActive } = useSignIn();
+  const { isSignedIn } = useAuth();
   const [password, setPassword] = useState<string>("");
   const [emailAddress, setEmailAddress] = useState<string>("");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -29,6 +30,12 @@ const SignIn = () => {
   const [code, setCode] = useState("");
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.push("/dashboard");
+    }
+  }, [isLoaded, isSignedIn, router]);
 
   if (!isLoaded) {
     return <Spinner />;
@@ -57,6 +64,9 @@ const SignIn = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log("Error", error.errors[0].message);
+      if (error.errors[0].code === "session_exists") {
+        router.push("/dashboard");
+      }
       setError(error.errors[0].message);
     }
   }
