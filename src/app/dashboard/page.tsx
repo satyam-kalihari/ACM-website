@@ -4,9 +4,25 @@ import { redirect } from "next/navigation";
 import { createUser } from "@/lib/db/createUser";
 import { getUserFromDB } from "@/lib/db/getUser";
 import { Spinner } from "@/components/ui/spinner";
+import { platform } from "os";
+import { string } from "zod";
+interface PlatformCard {
+  platform: string;
+  heading: string;
+  value: number;
+  point: number;
+  icon: string;
+}
 
 const Dashboard = async () => {
   // const router = useRouter();
+  const platformCardsDetail: PlatformCard[] = [
+    { platform: "leetcode", heading: "hard", value: 3, point: 12, icon: "" },
+    { platform: "leetcode", heading: "medium", value: 15, point: 30, icon: "" },
+    { platform: "leetcode", heading: "easy", value: 43, point: 34, icon: "" },
+    { platform: "github", heading: "stars", value: 43, point: 3, icon: "" },
+  ];
+
   const clerkUser = await currentUser();
   if (!clerkUser) {
     redirect("/sign-in");
@@ -62,7 +78,24 @@ const Dashboard = async () => {
         </div>
       }
     >
-      <div>Dashboard</div>
+      <section id="tittle_section">
+        <div id="hello_message">Ready to rock {clerkUser.firstName} ?</div>
+        <div id="total_point"></div>
+      </section>
+      <section id="content_section">
+        <div id="content_left">
+          <div id="platform_cards" className=" grid grid-cols-2 sm:grid-cols-4 gap-1.5 md:gap-2.5">
+            {platformCardsDetail.map((card) => (
+              <div
+                key={card.heading}
+                className="w-[140] md:w-40 h-20 bg-amber-100 m-2 rounded-2xl mx-auto"
+              ></div>
+            ))}
+          </div>
+          <div id="leaderboard"></div>
+        </div>
+        <div id="content_right"></div>
+      </section>
     </Suspense>
   );
 };
