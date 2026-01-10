@@ -5,7 +5,9 @@ import { createUser } from "@/lib/db/createUser";
 import { getUserFromDB } from "@/lib/db/getUser";
 import { Spinner } from "@/components/ui/spinner";
 import Leaderboard from "@/components/Leaderboard";
-import { AlignEndHorizontal, BadgeQuestionMark, Book, FolderGit, FolderGit2, Star } from "lucide-react";
+import { AlignEndHorizontal, Book, FolderGit, FolderGit2, Star } from "lucide-react";
+import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
+import { Spotlight } from "@/components/ui/spotlight-new";
 
 interface PlatformCard {
   platform: "leetcode" | "github";
@@ -22,7 +24,14 @@ interface githubReoDetail {
   repoLink: string;
 }
 
+function getWindowDimensions() {
+  const { innerWidth: width, innerHeight: height } = window;
+  return { width, height };
+}
+
 const Dashboard = async () => {
+
+
   // const router = useRouter();
   const platformCardsDetail: PlatformCard[] = [
     { platform: "leetcode", heading: "hard", value: 3, point: 12, icon: "" },
@@ -105,6 +114,8 @@ const Dashboard = async () => {
     await new Promise((resolve) => setTimeout(resolve, 1000 * retries));
   }
 
+  
+
   return (
     <Suspense
       fallback={
@@ -113,113 +124,122 @@ const Dashboard = async () => {
         </div>
       }
     >
-      <section id="tittle_section">
-        <div id="hello_message">Ready to rock {clerkUser.firstName} ?</div>
-        <div id="total_point"></div>
-      </section>
-      <section id="content_section" className="lg:flex">
-        {/* content_left */}
-        <div id="content_left" className="sm:w-3/4">
-          {/* platform_cards */}
-          <div
-            id="platform_cards"
-            className=" grid grid-cols-2 sm:grid-cols-4 gap-1.5 md:gap-2.5"
-          >
-            {platformCardsDetail.map((card) => (
-              <div
-                key={card.heading}
-                className="w-[140] md:w-40 h-20 m-2 rounded-md mx-auto bg-cover bg-[url('/images/test_bg.png')]"
-              >
+      <div className="relative min-h-screen overflow-x-clip">
+        {/* <BackgroundRippleEffect rows={16} /> */}
+        <div className="w-screen h-screen fixed">
+          <Spotlight />
+        </div>
+        <section id="tittle_section">
+          <div id="hello_message">Ready to rock {clerkUser.firstName} ?</div>
+          <div id="total_point"></div>
+        </section>
+        <section id="content_section" className="lg:flex">
+          {/* content_left */}
+          <div id="content_left" className="sm:w-3/4">
+            {/* platform_cards */}
+            <div
+              id="platform_cards"
+              className=" grid grid-cols-2 sm:grid-cols-4 gap-1.5 md:gap-2.5"
+            >
+              {platformCardsDetail.map((card) => (
                 <div
-                  className={`h-full w-full p-1 sm:pl-2 sm:pt-2 ${
-                    card.platform == "leetcode"
-                      ? "from-yellow-400/30 to-yellow-50/30"
-                      : "from-fuchsia-400/30 to-red-100/30"
-                  } bg-linear-to-br rounded-md backdrop-blur-xs border ${
-                    card.platform == "leetcode"
-                      ? "border-yellow-500/50"
-                      : "border-fuchsia-600/50"
-                  }`}
+                  key={card.heading}
+                  className="w-[140] md:w-40 h-20 m-2 rounded-md mx-auto bg-cover "
                 >
                   <div
-                    id="platform_card_header"
-                    className="flex justify-between items-center"
+                    className={`h-full w-full p-1 sm:pl-2 sm:pt-2 ${
+                      card.platform == "leetcode"
+                        ? "from-yellow-400/30 to-yellow-50/30"
+                        : "from-fuchsia-400/30 to-red-100/30"
+                    } bg-linear-to-br rounded-md backdrop-blur-xs border ${
+                      card.platform == "leetcode"
+                        ? "border-yellow-500/50"
+                        : "border-fuchsia-600/50"
+                    }`}
                   >
-                    <div className="flex gap-4 items-center">
-                      <div id="platform_card_icon">
-                        {card.platform == "leetcode" ? (
-                          <AlignEndHorizontal color="#ecdd79" />
-                        ) : (
-                          // <BadgeQuestionMark color="#ecdd79" />
-                          <FolderGit color="#d979ec" />
-                        )}
+                    <div
+                      id="platform_card_header"
+                      className="flex justify-between items-center"
+                    >
+                      <div className="flex gap-4 items-center">
+                        <div id="platform_card_icon">
+                          {card.platform == "leetcode" ? (
+                            <AlignEndHorizontal color="#ecdd79" />
+                          ) : (
+                            // <BadgeQuestionMark color="#ecdd79" />
+                            <FolderGit color="#d979ec" />
+                          )}
+                        </div>
+                        <div id="platform_card_header_text">{card.heading}</div>
                       </div>
-                      <div id="platform_card_header_text">{card.heading}</div>
+                      <div id="platform_card_value" className="mx-1">
+                        {card.value}
+                      </div>
                     </div>
-                    <div id="platform_card_value" className="mx-1">
-                      {card.value}
+                    <div
+                      id="platform_card_points"
+                      className="mx-1 flex justify-center items-center font-bold text-3xl m-auto "
+                    >
+                      {card.point}
                     </div>
-                  </div>
-                  <div
-                    id="platform_card_points"
-                    className="mx-1 flex justify-center items-center font-bold text-3xl m-auto "
-                  >
-                    {card.point}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* leaderboard */}
+            <div id="leaderboard">
+              <Leaderboard />
+            </div>
           </div>
 
-          {/* leaderboard */}
-          <div id="leaderboard">
-            <Leaderboard />
-          </div>
-        </div>
-
-        {/* content_right */}
-        <div id="content_right" className="min-w-fit mt-5 sm:px-2.5 sm:mx-auto">
-          {/* github_card */}
+          {/* content_right */}
           <div
-            id="github_card"
-            className="w-70 h-70 mx-auto p-1 sm:pl-2 sm:pt-2
-                       sm:rounded-md backdrop-blur-xs border border-white/30"
-          ></div>
-          {/* github_toggle */}
-          <div
-            id="github_toggle"
-            className="mb-2 mt-7 w-40 h-10 b sm:rounded-sm  border border-fuchsia-600/50 relative flex"
+            id="content_right"
+            className="min-w-fit mt-5 sm:px-2.5 sm:mx-auto"
           >
-            <div className="w-1/2 flex justify-center items-center">
-              <FolderGit2 size={18} />
-            </div>
-            <div className="w-1/2 flex justify-center items-center">
-              <Star size={18} />
-            </div>
-            <div className="w-1/2 absolute left-0 bg-fuchsia-400/20 sm:rounded-sm backdrop-blur-xs -z-10 h-full"></div>
-          </div>
-          {/* repos */}
-          <div id="repos" className="flex flex-col items-center gap-2">
-            {githubRepos.map((repo, key) => (
-              <div
-                key={key}
-                id="repo_card"
-                className="border border-white/30 sm:rounded-sm w-80 sm:w-95 h-11 p-2"
-              >
-                <div className="flex justify-between">
-                  <div className="flex">
-                    <Book /> <h2 className="ml-2">{repo.reponame}</h2>
-                  </div>
-                  <Star
-                    fill={repo.stared ? "white" : "none"}
-                    className="left-0"
-                  />
-                </div>
+            {/* github_card */}
+            <div
+              id="github_card"
+              className="w-70 h-70 mx-auto p-1 sm:pl-2 sm:pt-2
+                       sm:rounded-md backdrop-blur-xs border border-white/30"
+            ></div>
+            {/* github_toggle */}
+            <div
+              id="github_toggle"
+              className="mb-2 mt-7 w-40 h-10 b sm:rounded-sm  border border-fuchsia-600/50 relative flex"
+            >
+              <div className="w-1/2 flex justify-center items-center">
+                <FolderGit2 size={18} />
               </div>
-            ))}
+              <div className="w-1/2 flex justify-center items-center">
+                <Star size={18} />
+              </div>
+              <div className="w-1/2 absolute left-0 bg-fuchsia-400/20 sm:rounded-sm backdrop-blur-xs -z-10 h-full"></div>
+            </div>
+            {/* repos */}
+            <div id="repos" className="flex flex-col items-center gap-2">
+              {githubRepos.map((repo, key) => (
+                <div
+                  key={key}
+                  id="repo_card"
+                  className="border border-white/30 sm:rounded-sm w-80 sm:w-95 h-11 p-2"
+                >
+                  <div className="flex justify-between">
+                    <div className="flex">
+                      <Book /> <h2 className="ml-2">{repo.reponame}</h2>
+                    </div>
+                    <Star
+                      fill={repo.stared ? "white" : "none"}
+                      className="left-0"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </Suspense>
   );
 };
