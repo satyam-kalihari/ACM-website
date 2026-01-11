@@ -16,7 +16,6 @@ import {
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -36,75 +35,87 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const data: Payment[] = [
+const data: LeaderBoard[] = [
   {
     id: "m5gr84i9",
-    amount: 316,
-    status: "success",
+    points: 316,
+    name: "ken99",
     email: "ken99@example.com",
   },
   {
     id: "3u1reuv4",
-    amount: 242,
-    status: "success",
+    points: 242,
+    name: "Abe45",
     email: "Abe45@example.com",
   },
   {
     id: "derv1ws0",
-    amount: 837,
-    status: "processing",
+    points: 837,
+    name: "Monserrat44",
     email: "Monserrat44@example.com",
   },
   {
     id: "5kma53ae",
-    amount: 874,
-    status: "success",
+    points: 874,
+    name: "Silas22",
     email: "Silas22@example.com",
   },
   {
     id: "bhqecj4p",
-        amount: 721,
-        status: "failed",
+    points: 721,
+    name: "carmella",
+    email: "carmella@example.com",
+  },
+  {
+    id: "bhqecj4p",
+    points: 721,
+    name: "carmella",
+    email: "carmella@example.com",
+  },
+  {
+    id: "bhqecj4p",
+    points: 721,
+    name: "carmella",
+    email: "carmella@example.com",
+  },
+  {
+    id: "bhqecj4p",
+    points: 721,
+    name: "carmella",
+    email: "carmella@example.com",
+  },
+  {
+    id: "bhqecj4p",
+    points: 721,
+    name: "carmella",
+    email: "carmella@example.com",
+  },
+  {
+    id: "bhqecj4p",
+    points: 721,
+    name: "carmella",
+    email: "carmella@example.com",
+  },
+  {
+    id: "bhqecj4p",
+    points: 721,
+    name: "carmella",
     email: "carmella@example.com",
   },
 ];
 
-export type Payment = {
+export type LeaderBoard = {
   id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
+  points: number;
+  name: string;
   email: string;
 };
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<LeaderBoard>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
-    ),
+    accessorKey: "name",
+    header: "name",
+    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
   {
     accessorKey: "email",
@@ -122,18 +133,12 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
+    accessorKey: "points",
+    header: () => <div className="text-right">Points</div>,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
+      const amount = parseFloat(row.getValue("points"));
 
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-
-      return <div className="text-right font-medium">{formatted}</div>;
+      return <div className="text-right font-medium">{amount}</div>;
     },
   },
   {
@@ -153,13 +158,13 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(payment.email)}
             >
-              Copy payment ID
+              Copy email ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>View user</DropdownMenuItem>
+            {/* <DropdownMenuItem>View payment details</DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -258,7 +263,6 @@ export default function Leaderboard() {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
