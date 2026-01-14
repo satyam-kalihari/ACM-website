@@ -34,6 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Image from "next/image";
 
 const data: LeaderBoard[] = [
   {
@@ -41,65 +42,76 @@ const data: LeaderBoard[] = [
     points: 316,
     name: "ken99",
     email: "ken99@example.com",
+    avatar: "/images/test_bg2.jpg",
   },
   {
     id: "3u1reuv4",
     points: 242,
     name: "Abe45",
+    avatar: "/images/test_bg2.jpg",
     email: "Abe45@example.com",
   },
   {
     id: "derv1ws0",
     points: 837,
     name: "Monserrat44",
+    avatar: "/images/test_bg.png",
     email: "Monserrat44@example.com",
   },
   {
     id: "5kma53ae",
     points: 874,
     name: "Silas22",
+    avatar: "/images/test_bg2.jpg",
     email: "Silas22@example.com",
   },
   {
     id: "bhqecj4p",
     points: 721,
     name: "carmella",
+    avatar: "/images/test_bg2.jpg",
     email: "carmella@example.com",
   },
   {
     id: "bhqecj4p",
     points: 721,
     name: "carmella",
+    avatar: "/images/test_bg.png",
     email: "carmella@example.com",
   },
   {
     id: "bhqecj4p",
     points: 721,
     name: "carmella",
+    avatar: "/images/test_bg2.jpg",
     email: "carmella@example.com",
   },
   {
     id: "bhqecj4p",
     points: 721,
     name: "carmella",
+    avatar: "/images/test_bg.png",
     email: "carmella@example.com",
   },
   {
     id: "bhqecj4p",
     points: 721,
     name: "carmella",
+    avatar: "/images/test_bg2.jpg",
     email: "carmella@example.com",
   },
   {
     id: "bhqecj4p",
     points: 721,
     name: "carmella",
+    avatar: "/images/test_bg.png",
     email: "carmella@example.com",
   },
   {
     id: "bhqecj4p",
     points: 721,
     name: "carmella",
+    avatar: "/images/test_bg2.jpg",
     email: "carmella@example.com",
   },
 ];
@@ -109,12 +121,30 @@ export type LeaderBoard = {
   points: number;
   name: string;
   email: string;
+  avatar: string;
 };
 
 export const columns: ColumnDef<LeaderBoard>[] = [
   {
+    accessorKey: "avatar",
+    header: () => <div className="text-right"></div>,
+    cell: ({ row }) => {
+      return (
+        <div className="flex justify-center items-center">
+          <Image
+            className="rounded-full bg-cover"
+            width={24}
+            height={24}
+            src={row.getValue("avatar")}
+            alt="avatar"
+          />
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "name",
-    header: "name",
+    header: "Name",
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
   {
@@ -124,13 +154,16 @@ export const columns: ColumnDef<LeaderBoard>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="hidden sm:flex"
         >
           Email
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase hidden sm:block">{row.getValue("email")}</div>
+    ),
   },
   {
     accessorKey: "points",
@@ -201,7 +234,7 @@ export default function Leaderboard() {
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full  sm:pl-3">
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
@@ -209,11 +242,11 @@ export default function Leaderboard() {
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="w-1/2 sm:max-w-sm"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline" className="ml-auto text-black">
               Columns <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
@@ -238,14 +271,14 @@ export default function Leaderboard() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="overflow-hidden rounded-md border">
-        <Table>
+      <div className="overflow-hidden ">
+        <Table className=" overflow-clip">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className=" text-amber-50">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -258,11 +291,12 @@ export default function Leaderboard() {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
+                  className=" first:text overflow-clip "
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -292,7 +326,7 @@ export default function Leaderboard() {
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2 text-black">
           <Button
             variant="outline"
             size="sm"
