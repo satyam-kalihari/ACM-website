@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { motion } from "motion/react";
+import { cn } from "@/lib/utils";
 
 type SpotlightProps = {
   gradientFirst?: string;
@@ -12,6 +13,7 @@ type SpotlightProps = {
   smallWidth?: number;
   duration?: number;
   xOffset?: number;
+  className?: string;
 };
 
 export const Spotlight = ({
@@ -24,6 +26,7 @@ export const Spotlight = ({
   smallWidth = 240,
   duration = 7,
   xOffset = 100,
+  className,
 }: SpotlightProps = {}) => {
   return (
     <motion.div
@@ -36,7 +39,7 @@ export const Spotlight = ({
       transition={{
         duration: 1.5,
       }}
-      className="pointer-events-none absolute inset-0 h-full w-full"
+      className={cn("pointer-events-none absolute inset-0 h-full w-full", className)}
     >
       <motion.div
         animate={{

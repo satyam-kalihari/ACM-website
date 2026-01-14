@@ -121,155 +121,115 @@ const Dashboard = async () => {
         </div>
       }
     >
-      <div className="relative min-h-screen overflow-x-clip">
-        <div className="w-screen h-screen fixed -z-10">
-          <Spotlight />
+      <div className="relative min-h-screen overflow-x-clip pb-10 bg-transparent text-foreground transition-colors duration-300">
+
+        <div className="w-screen h-screen fixed -z-10 dark:bg-[#040609] bg-transparent">
+          <Spotlight className="hidden dark:block" />
         </div>
-        <section id="tittle_section">
-          <div
-            id="hello_message"
-            className="font-roboto sm:ml-3 text-[29px] sm:text-[32px] lg:text-[44px] mt-5 mb-8 sm:mt-7 sm:mb-8 lg:mt-8 lg:mb-10"
-          >
-            Good to see you, {clerkUser.firstName}
-          </div>
-          <div id="total_point"></div>
-        </section>
-        <section id="content_section" className="md:flex">
-          {/* content_left */}
-          <div id="content_left" className="md:w-3/4">
-            {/* platform_cards */}
+        <div className="container mx-auto px-4 md:px-6">
+          <section id="tittle_section">
             <div
-              id="platform_cards"
-              className=" grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2.5 mb-8 sm:mb-10 lg:mb-12"
+              id="hello_message"
+              className="font-roboto text-2xl md:text-4xl font-bold mt-8 mb-8 text-foreground"
             >
-              {platformCardsDetail.map((card) => (
-                <div
-                  key={card.heading}
-                  className="w-[140] md:w-44 md:h-24 h-20 rounded-md mx-auto bg-cover "
-                >
-                  <div
-                    className={`h-full w-full p-1 sm:pl-2 sm:pt-2 ${
-                      card.platform == "leetcode"
-                        ? "from-yellow-400/30 to-yellow-50/30"
-                        : "from-fuchsia-400/30 to-red-100/30"
-                    } bg-linear-to-br rounded-md backdrop-blur-xs border ${
-                      card.platform == "leetcode"
-                        ? "border-yellow-500/50"
-                        : "border-fuchsia-600/50"
-                    }`}
-                  >
-                    <div
-                      id="platform_card_header"
-                      className="flex justify-between items-center"
-                    >
-                      <div className="flex gap-4 items-center">
-                        <div id="platform_card_icon">
-                          {card.platform == "leetcode" ? (
-                            <AlignEndHorizontal color="#ecdd79" size={18} />
-                          ) : (
-                            // <BadgeQuestionMark color="#ecdd79" />
-                            <FolderGit color="#d979ec" size={18} />
-                          )}
-                        </div>
-                        <div id="platform_card_header_text">{card.heading}</div>
-                      </div>
-                      <div id="platform_card_value" className="mx-1">
-                        {card.value}
-                      </div>
-                    </div>
-                    <div
-                      id="platform_card_points"
-                      className="mx-1 flex justify-center items-center font-bold text-3xl m-auto "
-                    >
-                      {card.point}
-                    </div>
-                  </div>
-                </div>
-              ))}
+              Good to see you, <span className="text-[#00BCA2]">{clerkUser.firstName}</span>
             </div>
+          </section>
 
-            {/* leaderboard */}
-            <div id="leaderboard">
-              <h2 className="font-roboto text-[22px] sm:text-[24px] lg:text-[30px] sm:ml-3">
-                Leader Board
-              </h2>
-              <Leaderboard />
-            </div>
-          </div>
-
-          {/* content_right */}
-          <div
-            id="content_right"
-            className="min-w-fit mt-5 md:mt-0 sm:px-2.5 sm:mx-auto"
-          >
-            {/* github_card */}
-            <div
-              id="github_card"
-              className="min-h-70 mx-auto p-2 rounded-md backdrop-blur-xs sm:p-2.5"
-            >
+          <section id="content_section" className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Left Column: Stats & Leaderboard */}
+            <div className="lg:col-span-3 space-y-8">
+              {/* Platform Cards */}
               <div
-                id="github_avatar"
-                className="w-30 h-30 sm:w-50 sm:h-50 bg-[url('/images/test_bg2.jpg')] bg-cover bg-center rounded-full mx-auto mb-6
-              "
-              ></div>
-              <div id="github_card_content" className="min-w-[320px] max-w-95">
-                <h3 className=" font-bold">satyam kalihari</h3>
-                <h3 className=" font-extralight mb-4">
-                  satyam-kalihari he/him
-                </h3>
-                <p className="mb-2">
-                  My journey in the world of technology began with a curiosity
-                  for design and a desire to build websites that capture
-                  attention, just like the Apple website does.
-                </p>
-                <p className=" flex gap-3 font-light">
-                  <Users size={18} />
-                  10 followers • 13 following
-                </p>
-              </div>
-            </div>
-            <div className="w-fit mx-auto">
-              {/* github_toggle */}
-              <div
-                id="github_toggle"
-                className="mb-2 mt-7 w-40 h-10 rounded-md overflow-clip border border-fuchsia-600/50 relative flex"
+                id="platform_cards"
+                className="grid grid-cols-2 md:grid-cols-4 gap-4"
               >
-                <div className="w-1/2 flex justify-center items-center">
-                  <FolderGit2 size={18} />
-                </div>
-                <div className="w-1/2 flex justify-center items-center">
-                  <Star size={18} />
-                </div>
-                <div className="w-1/2 absolute left-0 bg-fuchsia-400/20 sm:rounded-sm backdrop-blur-xs -z-10 h-full"></div>
-              </div>
-              {/* repos */}
-              <div
-                id="repos"
-                className="flex flex-col items-center gap-2 max-h-60 overflow-y-scroll no-scrollbar"
-              >
-                {githubRepos.map((repo, key) => (
+                {platformCardsDetail.map((card) => (
                   <div
-                    key={key}
-                    id="repo_card"
-                    className=" border-white/30 sm:rounded-sm w-80 sm:w-95 h-11 p-2"
+                    key={card.heading}
+                    className="relative overflow-hidden rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-4 hover:bg-card/80 transition-colors shadow-sm"
                   >
-                    <div className="flex justify-between">
-                      <div className="flex items-baseline">
-                        <Book size={20} />{" "}
-                        <h2 className="ml-2">{repo.reponame}</h2>
+                    <div className="flex items-start justify-between">
+                      <div className={`p-2 rounded-lg ${card.platform === "leetcode" ? "bg-yellow-500/10 text-yellow-600 dark:text-yellow-500" : "bg-purple-500/10 text-purple-600 dark:text-purple-500"}`}>
+                        {card.platform === "leetcode" ? (
+                          <AlignEndHorizontal size={20} />
+                        ) : (
+                          <FolderGit size={20} />
+                        )}
                       </div>
-                      <Star
-                        fill={repo.stared ? "white" : "none"}
-                        size={18}
-                        className="left-0"
-                      />
+                      <div className="text-2xl font-bold text-foreground">{card.point}</div>
+                    </div>
+                    <div className="mt-4">
+                      <div className="text-sm text-muted-foreground">{card.heading}</div>
+                      <div className="text-xs text-muted-foreground mt-1">Total: {card.value}</div>
                     </div>
                   </div>
                 ))}
               </div>
+
+              {/* Leaderboard */}
+              <div id="leaderboard" className="space-y-4">
+                <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                  <Users className="h-5 w-5 text-[#00BCA2]" /> Leaderboard
+                </h2>
+                <Leaderboard />
+              </div>
             </div>
-          </div>
-        </section>
+
+            {/* Right Column: GitHub Profile */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-24 space-y-6">
+                {/* GitHub Profile Card */}
+                <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden p-6 space-y-6 shadow-sm">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-24 h-24 rounded-full border-2 border-[#00BCA2] p-1 mb-4">
+                      <div className="w-full h-full rounded-full bg-cover bg-center bg-gray-200 dark:bg-gray-800" style={{ backgroundImage: `url('/images/test_bg2.jpg')` }}></div>
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground">satyam kalihari</h3>
+                    <p className="text-sm text-muted-foreground">@satyam-kalihari</p>
+                  </div>
+
+                  <p className="text-sm text-muted-foreground text-center leading-relaxed">
+                    My journey in technology began with a curiosity for design and a desire to build premium web experiences.
+                  </p>
+
+                  <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Users size={14} /> <span>10 followers</span>
+                    </div>
+                    <div>•</div>
+                    <div>13 following</div>
+                  </div>
+
+                  <hr className="border-border/50" />
+
+                  {/* Repos Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-semibold text-foreground">Repositories</h4>
+                      <FolderGit2 size={16} className="text-[#00BCA2]" />
+                    </div>
+
+                    <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                      {githubRepos.map((repo, idx) => (
+                        <div key={idx} className="group flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-all border border-transparent">
+                          <div className="flex items-center gap-3 overflow-hidden">
+                            <Book size={16} className="text-blue-500 shrink-0" />
+                            <div className="truncate">
+                              <div className="text-sm font-medium text-foreground truncate">{repo.reponame}</div>
+                              <div className="text-[10px] text-muted-foreground">{repo.language}</div>
+                            </div>
+                          </div>
+                          {repo.stared && <Star size={14} className="text-yellow-500 shrink-0 fill-yellow-500" />}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
     </Suspense>
   );
