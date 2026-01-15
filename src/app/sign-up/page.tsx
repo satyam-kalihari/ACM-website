@@ -30,7 +30,11 @@ const SignUp = () => {
   const router = useRouter();
 
   if (!isLoaded) {
-    return <Spinner />;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+      </div>
+    );
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -38,7 +42,11 @@ const SignUp = () => {
     console.log("Submit running");
 
     if (!isLoaded) {
-      return <Spinner />;
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <Spinner />
+        </div>
+      );
     }
 
     try {
@@ -61,7 +69,11 @@ const SignUp = () => {
   async function onVerify(e: React.FormEvent) {
     e.preventDefault();
     if (!isLoaded) {
-      return <Spinner />;
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <Spinner />
+        </div>
+      );
     }
 
     try {
@@ -88,90 +100,113 @@ const SignUp = () => {
   }
 
   return (
-    <>
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Sign-up for your account</CardTitle>
-          <CardDescription>Enter your email below to sign-up</CardDescription>
-          <CardAction>
-            <Button
-              variant="link"
-              onClick={() => {
-                router.push("/sign-in");
-              }}
-            >
-              Sign In
-            </Button>
-          </CardAction>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={onSubmit}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  value={emailAddress}
-                  onChange={(e) => {
-                    setEmailAddress(e.target.value);
-                  }}
-                  id="email"
-                  type="email"
-                  placeholder="example@sitnagpur.siu.edu.in"
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+    <div className="flex min-h-screen w-full">
+      <div className="flex w-full flex-col justify-center items-center p-8 lg:w-1/2">
+        <div className="w-full max-w-sm">
+          {!isVarificationPending ? (
+            <Card className="w-full border-0 shadow-none sm:border sm:shadow-sm">
+              <CardHeader className="flex flex-col">
+                <CardTitle className="text-2xl font-bold">
+                  Sign-up for your account
+                </CardTitle>
+                <CardDescription>
+                  Enter your email below to sign-up
+                </CardDescription>
+                <CardAction className="self-end">
+                  <Button
+                    variant="link"
+                    className="px-0"
+                    onClick={() => {
+                      router.push("/sign-in");
+                    }}
                   >
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                  }}
-                  id="password"
-                  type="password"
-                  required
-                />
-              </div>
-            </div>
-            <div className="flex-col mt-2">
-              <Button type="submit" className="w-full">
-                Sign-up
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-      {isVarificationPending && (
-        <>
-          <Card className="w-full max-w-sm">
-            <CardHeader>
-              <CardTitle>Inter code</CardTitle>
-            </CardHeader>
+                    Already have an account? Sign In
+                  </Button>
+                </CardAction>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={onSubmit}>
+                  <div className="flex flex-col gap-6">
+                    <div className="grid gap-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        value={emailAddress}
+                        onChange={(e) => {
+                          setEmailAddress(e.target.value);
+                        }}
+                        id="email"
+                        type="email"
+                        placeholder="example@sitnagpur.siu.edu.in"
+                        required
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <div className="flex items-center">
+                        <Label htmlFor="password">Password</Label>
+                        <a
+                          href="#"
+                          className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                        >
+                          Forgot your password?
+                        </a>
+                      </div>
+                      <Input
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                        }}
+                        id="password"
+                        type="password"
+                        required
+                      />
+                    </div>
+                  </div>
+                  {error && (
+                    <div className="text-red-500 text-sm mt-2">{error}</div>
+                  )}
+                  <div className="flex-col mt-4">
+                    <Button type="submit" className="w-full">
+                      Sign-up
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="w-full max-w-sm">
+              <CardHeader>
+                <CardTitle>Inter code</CardTitle>
+              </CardHeader>
 
-            <CardContent>
-              <Input
-                type="text"
-                value={code}
-                onChange={(e) => {
-                  setCode(e.target.value);
-                }}
-              />
-            </CardContent>
-            <CardFooter>
-              <Button onClick={onVerify}>Verify</Button>
-            </CardFooter>
-          </Card>
-        </>
-      )}
-    </>
+              <CardContent>
+                <Input
+                  type="text"
+                  value={code}
+                  onChange={(e) => {
+                    setCode(e.target.value);
+                  }}
+                  placeholder="Verification Code"
+                />
+              </CardContent>
+              <CardFooter>
+                <Button onClick={onVerify} className="w-full">
+                  Verify
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
+        </div>
+      </div>
+
+      <div className="hidden lg:block lg:w-1/2 relative bg-muted">
+        <img
+          src="/images/sign-up-bg.png"
+          alt="Sign Up Background"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/20" />{" "}
+      </div>
+    </div>
   );
 };
 
