@@ -172,7 +172,7 @@ const Dashboard = async () => {
                 <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
                   <Users className="h-5 w-5 text-[#00BCA2]" /> Leaderboard
                 </h2>
-                <Leaderboard />
+                <Leaderboard isDashboard={true} />
               </div>
             </div>
 
