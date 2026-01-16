@@ -14,6 +14,7 @@ import {
   Users,
 } from "lucide-react";
 import { Spotlight } from "@/components/ui/spotlight-new";
+import Footer from "@/components/Footer";
 
 interface PlatformCard {
   platform: "leetcode" | "github";
@@ -231,6 +232,7 @@ const Dashboard = async () => {
           </section>
         </div>
       </div>
+      <Footer />
     </Suspense>
   );
 };

@@ -41,7 +41,6 @@ export default function RootLayout({
           >
             <Navbar />
             {children}
-            <Footer />
           </ThemeProvider>
         </body>
       </html>
