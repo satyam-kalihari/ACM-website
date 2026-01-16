@@ -20,9 +20,9 @@ const RoomsLayout = ({ children }: { children: React.ReactNode }) => {
     <div className={`flex h-screen font-roboto ${roboto.variable}`}>
       <SocketProvider>
         <CurrentRoomProvider>
-          <SidebarProvider>
+          <SidebarProvider style={{ height: "100%", minHeight: "0" }} className="h-full overflow-hidden">
             <SidebarContainer />
-            <div className='w-full'>
+            <div className='w-full h-full overflow-hidden'>
               {children}
             </div>
           </SidebarProvider>
