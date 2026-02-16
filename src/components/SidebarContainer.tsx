@@ -79,8 +79,8 @@ const SidebarContainer = () => {
                   const handleClick = (event: any) => {
                     socket.emit("join-room", room);
                     socket.once("joined-successfully", (sRoom) => {
-                      setCurrentRoom(sRoom.room);
                       router.push(`/rooms/${sRoom.room.slug}`);
+                      setCurrentRoom(sRoom.room);
                     });
                   };
 

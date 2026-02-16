@@ -1,4 +1,4 @@
-import { Types, Document } from "mongoose";
+import { Types, Document, ObjectId } from "mongoose";
 
 
 export interface IUser extends Document {
@@ -46,4 +46,15 @@ export interface IProject extends Document{
     createdAt: Date;
     author: Types.ObjectId;
     upVotes: [Types.ObjectId];
+}
+
+export interface IMessage extends Document {
+    _id: Types.ObjectId;
+    content: string;
+    attachments: string[];
+    createdAt: Date;
+    room: Types.ObjectId;
+    author: ObjectId;
+    senderName: string;
+    readBy: Types.ObjectId[];
 }

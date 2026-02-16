@@ -31,7 +31,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+          className={`flex h-screen flex-col ${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
         >
           <ThemeProvider
             attribute="class"

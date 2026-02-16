@@ -14,7 +14,7 @@ io.on("connection", (socket) => {
     console.log("Connected:", socket.id)
 
     socket.on("send-message", (data) => {
-        io.to(data.roomId).emit("room-message",{ author: data.author, message: data.msg })
+        io.to(data.roomId).emit("room-message",{ author: data.author, content: data.msg, senderName: data.senderName })
     })
 
     socket.on("join-room", (room) => {

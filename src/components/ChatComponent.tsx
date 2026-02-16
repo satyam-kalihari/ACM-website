@@ -13,7 +13,7 @@ const ChatComponent = () => {
   const { isLoaded, user } = useUser()
   const [dbUser, setDbUser] = useState<any>()
   const [message, setMessage] = useState<string>("");
-  const [messages, setMessages] = useState<{ author?: String, message?: String, timestamp?: string, senderName?: string }[]>([]);
+  const [messages, setMessages] = useState<{ author?: String, content?: String, createdAt?: string, senderName?: string, attachments: string[], _id: string }[]>([]);
   const { currentRoom, setCurrentRoom } = useCurrentRoom();
   const socket = useSocket()
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -25,6 +25,25 @@ const ChatComponent = () => {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  useEffect(() => {
+    if (!isLoaded || !user) return;
+
+    fetch("/api/fetch/message", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({clerkId: user.id, roomId: currentRoom?._id})
+    })
+    .then(res => res.json())
+    .then(messages => {
+      if (messages?.data) {
+        console.log(messages.data)
+        setMessages(messages.data)
+      }
+    })
+  }, [isLoaded, user])
 
   useEffect(() => {
     if (!isLoaded || !user) return;
@@ -44,10 +63,27 @@ const ChatComponent = () => {
     }
   }, [socket])
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (message.trim() !== "") {
       // Add minimal mock data for immediate UI feedback if needed, 
       // but sticking to socket flow:
+
+      const res = await fetch("/api/create/message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+        roomId: currentRoom?._id,
+        author: dbUser?.user?._id,
+        msg: message,
+        // Sending extra metadata if server supports it, or we rely on client to rendering it locally
+        senderName: user?.fullName || user?.username || "Start",
+      })
+      });
+
+      console.log(user?.fullName, user?.username)
+
       socket.emit("send-message", {
         roomId: currentRoom?._id,
         author: dbUser?.user?._id,
@@ -138,7 +174,7 @@ const ChatComponent = () => {
                   </div>
                 ) : (
                   <div className={`w-10 shrink-0 text-[10px] text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 pr-1 self-center ${isCurrentUser ? 'text-left pl-1' : 'text-right'}`}>
-                    {formatTime(msg.timestamp)}
+                    {formatTime(msg.createdAt)}
                   </div>
                 )}
 
@@ -146,10 +182,10 @@ const ChatComponent = () => {
                   {!isSequence && (
                     <div className={`flex items-baseline gap-2 ${isCurrentUser ? 'flex-row-reverse' : ''}`}>
                       <span className="font-semibold text-gray-900 dark:text-gray-100 hover:underline cursor-pointer">
-                        {senderName}
+                        {isCurrentUser ? "You" : senderName}
                       </span>
                       <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">
-                        {formatTime(msg.timestamp)}
+                        {formatTime(msg.createdAt)}
                       </span>
                     </div>
                   )}
@@ -157,7 +193,7 @@ const ChatComponent = () => {
                     ? 'bg-[#5865F2] text-white rounded-tr-none'
                     : 'bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-gray-300 rounded-tl-none'
                     } ${isSequence ? '' : ''}`}>
-                    {msg.message}
+                    {msg.content}
                   </div>
                 </div>
               </div>
