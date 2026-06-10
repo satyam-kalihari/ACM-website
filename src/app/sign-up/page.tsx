@@ -22,6 +22,8 @@ const SignUp = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [password, setPassword] = useState<string>("");
   const [emailAddress, setEmailAddress] = useState<string>("");
+  const [githubUrl, setGithubUrl] = useState<string>("");
+  const [leetcodeUsername, setLeetcodeUsername] = useState<string>("");
   const [isVarificationPending, setIsVarificationPending] =
     useState<boolean>(false);
   const [code, setCode] = useState("");
@@ -78,7 +80,12 @@ const SignUp = () => {
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
 
-        router.push("/dashboard");
+        const query = new URLSearchParams({
+          githubUrl,
+          leetcodeUsername,
+        });
+
+        router.push(`/dashboard?${query.toString()}`);
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -138,6 +145,30 @@ const SignUp = () => {
                   id="password"
                   type="password"
                   required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="githubUrl">GitHub profile URL</Label>
+                <Input
+                  value={githubUrl}
+                  onChange={(e) => {
+                    setGithubUrl(e.target.value);
+                  }}
+                  id="githubUrl"
+                  type="url"
+                  placeholder="https://github.com/your-handle"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="leetcodeUsername">LeetCode username</Label>
+                <Input
+                  value={leetcodeUsername}
+                  onChange={(e) => {
+                    setLeetcodeUsername(e.target.value);
+                  }}
+                  id="leetcodeUsername"
+                  type="text"
+                  placeholder="your-leetcode-handle"
                 />
               </div>
             </div>

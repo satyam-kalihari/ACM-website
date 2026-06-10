@@ -1,9 +1,6 @@
-"use client";
-// import React, { useState } from "react";
 import axios from "axios";
-import type { AxiosResponse } from "axios";
 
-interface leetCodeData {
+export interface LeetCodeData {
   status: string;
   message: string;
   totalSolved: number;
@@ -21,21 +18,25 @@ interface leetCodeData {
   submissionCalendar: { string: number };
 }
 
-export default async function fetchLeetCodeData(leetCodeUsername: string) {
-  // const [leetCodeData, setLeetCodedata] = useState<leetCodeData>();
+export default async function fetchLeetCodeData(
+  leetCodeUsername: string,
+): Promise<LeetCodeData | null> {
+  if (!leetCodeUsername) {
+    return null;
+  }
 
   try {
-    const response: AxiosResponse<leetCodeData> = await axios.get(
-      `https://leetcode-stats-api.herokuapp.com/${leetCodeUsername}`
+    const response = await axios.get<LeetCodeData>(
+      `https://leetcode-stats-api.herokuapp.com/${leetCodeUsername}`,
     );
-    console.log(response.data);
-    // if (response) {
-    //   setLeetCodedata(response.data);
-    // }
+
+    return response.data;
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);
     }
     console.log("Error", error);
+
+    return null;
   }
 }

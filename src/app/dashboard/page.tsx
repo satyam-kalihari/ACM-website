@@ -3,6 +3,8 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createUser } from "@/lib/db/createUser";
 import { getUserFromDB } from "@/lib/db/getUser";
+import { getGithubData } from "@/lib/actions/github";
+import fetchLeetCodeData from "@/lib/actions/leetcode";
 import { Spinner } from "@/components/ui/spinner";
 import Leaderboard from "@/components/Leaderboard";
 import {
@@ -14,6 +16,7 @@ import {
   Users,
 } from "lucide-react";
 import { Spotlight } from "@/components/ui/spotlight-new";
+import ProfileForm from "@/components/ProfileForm";
 
 interface PlatformCard {
   platform: "leetcode" | "github";
@@ -30,42 +33,24 @@ interface githubReoDetail {
   repoLink: string;
 }
 
-const Dashboard = async () => {
+const getGithubUsernameFromUrl = (githubUrl?: string | null) => {
+  if (!githubUrl) {
+    return "";
+  }
+
+  return githubUrl.replace(/\/+$/, "").split("/").pop() ?? "";
+};
+
+const Dashboard = async ({
+  searchParams,
+}: {
+  searchParams?: {
+    githubUrl?: string;
+    leetcodeUsername?: string;
+  };
+}) => {
   // const router = useRouter();
-  const platformCardsDetail: PlatformCard[] = [
-    { platform: "leetcode", heading: "Hard", value: 3, point: 12, icon: "" },
-    { platform: "leetcode", heading: "Medium", value: 15, point: 30, icon: "" },
-    { platform: "leetcode", heading: "Easy", value: 43, point: 34, icon: "" },
-    { platform: "github", heading: "Stars", value: 43, point: 3, icon: "" },
-  ];
-
-  const githubRepos: githubReoDetail[] = [
-    {
-      reponame: "ACM-website",
-      stared: true,
-      language: "TypeScript",
-      repoLink: "",
-    },
-    {
-      reponame: "DSA",
-      stared: false,
-      language: "Java",
-      repoLink: "",
-    },
-    {
-      reponame: "clerk-practice-1",
-      stared: true,
-      language: "TypeScript",
-      repoLink: "",
-    },
-    {
-      reponame: "computer-network-college",
-      stared: false,
-      language: "C",
-      repoLink: "",
-    },
-  ];
-
+  let dbUser = null;
   const clerkUser = await currentUser();
   if (!clerkUser) {
     redirect("/sign-in");
@@ -75,24 +60,10 @@ const Dashboard = async () => {
   const maxRetries = 3;
 
   while (retries < maxRetries) {
-    let dbUser = null;
     try {
       dbUser = await getUserFromDB(clerkUser.id);
       if (dbUser) {
         break;
-      }
-
-      if (!dbUser) {
-        const newDbUser = await createUser({
-          fullname: clerkUser.firstName || "" + " " + clerkUser.lastName || "",
-          email: clerkUser.emailAddresses[0].emailAddress,
-          clerkId: clerkUser.id,
-          avatar: clerkUser.imageUrl || "/default-avatar.png",
-          role: "user",
-          techStack: [],
-        });
-
-        dbUser = newDbUser.dbUser;
       }
     } catch (error) {
       retries++;
@@ -112,6 +83,76 @@ const Dashboard = async () => {
     }
     await new Promise((resolve) => setTimeout(resolve, 1000 * retries));
   }
+
+  const resolvedSearchParams = searchParams ?? {};
+
+  const githubUrl = dbUser?.githubUrl ?? resolvedSearchParams.githubUrl ?? "";
+  const githubUsername =
+    getGithubUsernameFromUrl(githubUrl) || clerkUser.username || "";
+  const leetcodeUsername =
+    dbUser?.leetcodeUsername ?? resolvedSearchParams.leetcodeUsername ?? "";
+
+  const [githubData, leetCodeData] = await Promise.all([
+    githubUsername ? getGithubData(githubUsername) : Promise.resolve(null),
+    leetcodeUsername
+      ? fetchLeetCodeData(leetcodeUsername)
+      : Promise.resolve(null),
+  ]);
+
+  if (!dbUser) {
+    const newDbUser = await createUser({
+      fullname:
+        `${clerkUser.firstName ?? ""} ${clerkUser.lastName ?? ""}`.trim(),
+      email: clerkUser.emailAddresses[0].emailAddress,
+      clerkId: clerkUser.id,
+      avatar: clerkUser.imageUrl || "/default-avatar.png",
+      role: "user",
+      techStack: [],
+      githubUrl,
+      leetcodeUsername,
+    });
+
+    dbUser = newDbUser.dbUser;
+  }
+
+  const platformCardsDetail: PlatformCard[] = [
+    {
+      platform: "leetcode",
+      heading: "Hard",
+      value: leetCodeData?.hardSolved ?? 0,
+      point: (leetCodeData?.hardSolved ?? 0) * 4,
+      icon: "",
+    },
+    {
+      platform: "leetcode",
+      heading: "Medium",
+      value: leetCodeData?.mediumSolved ?? 0,
+      point: (leetCodeData?.mediumSolved ?? 0) * 2,
+      icon: "",
+    },
+    {
+      platform: "leetcode",
+      heading: "Easy",
+      value: leetCodeData?.easySolved ?? 0,
+      point: leetCodeData?.easySolved ?? 0,
+      icon: "",
+    },
+    {
+      platform: "github",
+      heading: "Stars",
+      value: githubData?.totalStars ?? 0,
+      point: githubData?.totalStars ?? 0,
+      icon: "",
+    },
+  ];
+
+  const githubRepos: githubReoDetail[] =
+    githubData?.repos.slice(0, 4).map((repo) => ({
+      reponame: repo.name,
+      stared: (repo.stargazers_count ?? 0) > 0,
+      language: repo.language ?? "Unknown",
+      repoLink: repo.html_url,
+    })) ?? [];
 
   return (
     <Suspense
@@ -136,7 +177,7 @@ const Dashboard = async () => {
         </section>
         <section id="content_section" className="md:flex">
           {/* content_left */}
-          <div id="content_left" className="md:w-3/4">
+          <div id="content_left" className="min-w-0 md:flex-1">
             {/* platform_cards */}
             <div
               id="platform_cards"
@@ -200,7 +241,7 @@ const Dashboard = async () => {
           {/* content_right */}
           <div
             id="content_right"
-            className="min-w-fit mt-5 md:mt-0 sm:px-2.5 sm:mx-auto"
+            className="mt-5 w-full md:mt-0 md:w-[360px] lg:w-[400px] md:shrink-0 sm:px-2.5 sm:mx-auto"
           >
             {/* github_card */}
             <div
@@ -209,26 +250,33 @@ const Dashboard = async () => {
             >
               <div
                 id="github_avatar"
-                className="w-30 h-30 sm:w-50 sm:h-50 bg-[url('/images/test_bg2.jpg')] bg-cover bg-center rounded-full mx-auto mb-6
-              "
+                style={{
+                  backgroundImage: `url(${githubData?.profile.avatar_url || clerkUser.imageUrl})`,
+                }}
+                className="w-30 h-30 sm:w-50 sm:h-50 bg-cover bg-center rounded-full mx-auto mb-6"
               ></div>
               <div id="github_card_content" className="min-w-[320px] max-w-95">
-                <h3 className=" font-bold">satyam kalihari</h3>
+                <h3 className=" font-bold">
+                  {dbUser?.fullname ?? clerkUser.firstName}
+                </h3>
                 <h3 className=" font-extralight mb-4">
-                  satyam-kalihari he/him
+                  {githubData?.profile.login ||
+                    githubUsername ||
+                    "github profile unavailable"}
                 </h3>
                 <p className="mb-2">
-                  My journey in the world of technology began with a curiosity
-                  for design and a desire to build websites that capture
-                  attention, just like the Apple website does.
+                  {githubData?.profile.bio ??
+                    "GitHub profile data will appear here once a GitHub username is saved for the user."}
                 </p>
                 <p className=" flex gap-3 font-light">
                   <Users size={18} />
-                  10 followers • 13 following
+                  {githubData?.profile.followers ?? 0} followers •{" "}
+                  {githubData?.profile.following ?? 0} following
                 </p>
               </div>
             </div>
-            <div className="w-fit mx-auto">
+            <ProfileForm />
+            <div className="w-full mx-auto">
               {/* github_toggle */}
               <div
                 id="github_toggle"
@@ -254,9 +302,16 @@ const Dashboard = async () => {
                     className=" border-white/30 sm:rounded-sm w-80 sm:w-95 h-11 p-2"
                   >
                     <div className="flex justify-between">
-                      <div className="flex items-baseline">
+                      <div className="flex items-baseline gap-2">
                         <Book size={20} />{" "}
-                        <h2 className="ml-2">{repo.reponame}</h2>
+                        <a
+                          href={repo.repoLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="ml-2 hover:underline"
+                        >
+                          {repo.reponame}
+                        </a>
                       </div>
                       <Star
                         fill={repo.stared ? "white" : "none"}

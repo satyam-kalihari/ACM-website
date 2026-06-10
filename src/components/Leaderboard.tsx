@@ -35,184 +35,127 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Image from "next/image";
+import {
+  loadLeaderboard,
+  type LeaderboardEntry,
+} from "@/lib/redux/leaderboardSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 
-const data: LeaderBoard[] = [
-  {
-    id: "m5gr84i9",
-    points: 316,
-    name: "ken99",
-    email: "ken99@example.com",
-    avatar: "/images/test_bg2.jpg",
-  },
-  {
-    id: "3u1reuv4",
-    points: 242,
-    name: "Abe45",
-    avatar: "/images/test_bg2.jpg",
-    email: "Abe45@example.com",
-  },
-  {
-    id: "derv1ws0",
-    points: 837,
-    name: "Monserrat44",
-    avatar: "/images/test_bg.png",
-    email: "Monserrat44@example.com",
-  },
-  {
-    id: "5kma53ae",
-    points: 874,
-    name: "Silas22",
-    avatar: "/images/test_bg2.jpg",
-    email: "Silas22@example.com",
-  },
-  {
-    id: "bhqecj4p",
-    points: 721,
-    name: "carmella",
-    avatar: "/images/test_bg2.jpg",
-    email: "carmella@example.com",
-  },
-  {
-    id: "bhqecj4p",
-    points: 721,
-    name: "carmella",
-    avatar: "/images/test_bg.png",
-    email: "carmella@example.com",
-  },
-  {
-    id: "bhqecj4p",
-    points: 721,
-    name: "carmella",
-    avatar: "/images/test_bg2.jpg",
-    email: "carmella@example.com",
-  },
-  {
-    id: "bhqecj4p",
-    points: 721,
-    name: "carmella",
-    avatar: "/images/test_bg.png",
-    email: "carmella@example.com",
-  },
-  {
-    id: "bhqecj4p",
-    points: 721,
-    name: "carmella",
-    avatar: "/images/test_bg2.jpg",
-    email: "carmella@example.com",
-  },
-  {
-    id: "bhqecj4p",
-    points: 721,
-    name: "carmella",
-    avatar: "/images/test_bg.png",
-    email: "carmella@example.com",
-  },
-  {
-    id: "bhqecj4p",
-    points: 721,
-    name: "carmella",
-    avatar: "/images/test_bg2.jpg",
-    email: "carmella@example.com",
-  },
-];
-
-export type LeaderBoard = {
-  id: string;
-  points: number;
-  name: string;
-  email: string;
-  avatar: string;
-};
-
-export const columns: ColumnDef<LeaderBoard>[] = [
-  {
-    accessorKey: "avatar",
-    header: () => <div className="text-right"></div>,
-    cell: ({ row }) => {
-      return (
-        <div className="flex justify-center items-center">
-          <Image
-            className="rounded-full bg-cover"
-            width={24}
-            height={24}
-            src={row.getValue("avatar")}
-            alt="avatar"
-          />
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="hidden sm:flex"
-        >
-          Email
-          <ArrowUpDown />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="lowercase hidden sm:block">{row.getValue("email")}</div>
-    ),
-  },
-  {
-    accessorKey: "points",
-    header: () => <div className="text-right">Points</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("points"));
-
-      return <div className="text-right font-medium">{amount}</div>;
-    },
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const payment = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.email)}
-            >
-              Copy email ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View user</DropdownMenuItem>
-            {/* <DropdownMenuItem>View payment details</DropdownMenuItem> */}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
+type LeaderBoard = LeaderboardEntry;
 
 export default function Leaderboard() {
+  const dispatch = useAppDispatch();
+  const {
+    users: data,
+    status,
+    error: loadError,
+  } = useAppSelector((state) => state.leaderboard);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const handleCopyEmail = React.useCallback((email: string) => {
+    navigator.clipboard.writeText(email);
+  }, []);
+
+  const columns = React.useMemo<ColumnDef<LeaderBoard>[]>(
+    () => [
+      {
+        accessorKey: "avatar",
+        header: () => <div className="text-right"></div>,
+        cell: ({ row }) => {
+          return (
+            <div className="flex justify-center items-center">
+              <Image
+                className="rounded-full bg-cover"
+                width={24}
+                height={24}
+                src={row.getValue("avatar")}
+                alt="avatar"
+              />
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "name",
+        header: "Name",
+        cell: ({ row }) => (
+          <div className="capitalize">{row.getValue("name")}</div>
+        ),
+      },
+      {
+        accessorKey: "email",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="hidden sm:flex"
+            >
+              Email
+              <ArrowUpDown />
+            </Button>
+          );
+        },
+        cell: ({ row }) => (
+          <div className="lowercase hidden sm:block">
+            {row.getValue("email")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "points",
+        header: () => <div className="text-right">Points</div>,
+        cell: ({ row }) => {
+          const amount = parseFloat(row.getValue("points"));
+
+          return <div className="text-right font-medium">{amount}</div>;
+        },
+      },
+      {
+        id: "actions",
+        enableHiding: false,
+        cell: ({ row }) => {
+          const payment = row.original;
+
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => handleCopyEmail(payment.email)}
+                >
+                  Copy email ID
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>View user</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      },
+    ],
+    [handleCopyEmail],
+  );
+
+  React.useEffect(() => {
+    if (status === "idle") {
+      dispatch(loadLeaderboard());
+    }
+  }, [dispatch, status]);
 
   const table = useReactTable({
     data,
@@ -233,15 +176,20 @@ export default function Leaderboard() {
     },
   });
 
+  const handleFilterChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      table.getColumn("email")?.setFilterValue(event.target.value);
+    },
+    [table],
+  );
+
   return (
-    <div className="w-full  sm:pl-3">
+    <div className="w-full sm:pl-3">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
+          placeholder="Filter names or emails..."
           value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
+          onChange={handleFilterChange}
           className="w-1/2 sm:max-w-sm"
         />
         <DropdownMenu>
@@ -271,6 +219,11 @@ export default function Leaderboard() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      {loadError ? (
+        <div className="mb-3 rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200">
+          {loadError}
+        </div>
+      ) : null}
       <div className="overflow-hidden ">
         <Table className=" overflow-clip">
           <TableHeader>
@@ -283,7 +236,7 @@ export default function Leaderboard() {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -292,17 +245,23 @@ export default function Leaderboard() {
             ))}
           </TableHeader>
           <TableBody className="">
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  className=" first:text overflow-clip "
+            {status === "loading" ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
                 >
+                  Loading leaderboard...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} className=" first:text overflow-clip ">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

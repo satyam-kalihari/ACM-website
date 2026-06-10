@@ -9,8 +9,15 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "img.clerk.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
+  output: "standalone",
   /* config options here */
   reactCompiler: true,
 };

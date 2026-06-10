@@ -1,10 +1,5 @@
-"use client";
-// import React, { useState } from "react";
 import axios from "axios";
-import type { AxiosResponse } from "axios";
-// import Image from "next/image";
-
-interface githubUserData {
+export interface GithubUserData {
   login: string;
   id: number;
   node_id: string;
@@ -40,43 +35,53 @@ interface githubUserData {
   updated_at: string;
 }
 
-export async function getGithubData(username: string) {
-  // const [githubData, setGithubData] = useState<githubUserData>();
+export interface GithubRepoData {
+  name: string;
+  html_url: string;
+  language: string | null;
+  stargazers_count: number;
+}
+
+export interface GithubData {
+  profile: GithubUserData;
+  repos: GithubRepoData[];
+  totalStars: number;
+}
+
+export async function getGithubData(
+  username: string,
+): Promise<GithubData | null> {
+  if (!username) {
+    return null;
+  }
 
   try {
-    const response: AxiosResponse<githubUserData> = await axios.get(
-      `https://api.github.com/users/${username}`
+    const response = await axios.get<GithubUserData>(
+      `https://api.github.com/users/${username}`,
     );
-    console.log(response.data);
-
-    //USE RESPONSE.DATA FOR UPDATING THE BACKEND
-
-    // if (response) {
-    //   setGithubData(response.data);
-    // }
-
-    //FOR TOTAL STARS ON A GITHUB PROFILE (FOR CALCULATING LEADERBOARD SCORE)
-    let repos = [];
-    const repoResponce = await axios.get(
-      "https://api.github.com/users/${username}/repos?per_page=100"
+    const repoResponse = await axios.get<GithubRepoData[]>(
+      `https://api.github.com/users/${username}/repos?per_page=100`,
     );
-    if (repoResponce.data) {
-      repos = repoResponce.data;
-      const totalStars = repos.reduce(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (sum: number, repo: any) => sum + (repo.stargazers_count || 0),
-        0
-      );
-      console.log("Total stars", totalStars);
-    }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+    const repos = repoResponse.data ?? [];
+    const totalStars = repos.reduce(
+      (sum, repo) => sum + (repo.stargazers_count || 0),
+      0,
+    );
+
+    return {
+      profile: response.data,
+      repos,
+      totalStars,
+    };
+  } catch (error) {
     if (axios.isAxiosError(error)) {
       console.log("Axios Error", error.message);
       if (error.response) {
         console.log(error.response.status);
       }
     }
+
+    return null;
   }
 }
